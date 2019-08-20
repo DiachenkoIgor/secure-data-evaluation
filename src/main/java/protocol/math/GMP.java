@@ -66,6 +66,10 @@ public final class GMP extends Number implements Comparable<GMP>
         releaseRef();
     }
 
+    public void clean(){
+        releaseRef();
+    }
+
 
     public void fromByteArray(byte[] v)
     {

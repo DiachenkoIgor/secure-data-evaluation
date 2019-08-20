@@ -153,6 +153,21 @@ public abstract class ECOperations {
 
         return new ECPoint(Xout, Yout);
     }
+    protected void close(){
+        slope.clean();
+        TWO.clean();
+        THREE.clean();
+        tmp.clean();
+        tmp2.clean();
+        tmp3.clean();
+        tmp4.clean();
+        GA.clean();
+        GN.clean();
+        Gx.clean();
+        Gx1.clean();
+        Gy.clean();
+        Gy1.clean();
+    }
     public static CustomECPoint convertECPointToCustom(ECPoint point){
         return new CustomECPoint(point.getAffineX(),point.getAffineY());
     }

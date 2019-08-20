@@ -45,5 +45,9 @@ public class WordComparisonEvaluator {
         }
     }
 
-
+    public void stop() throws IOException {
+        bce.close();
+        this.is.close();
+        this.os.close();
+    }
 }

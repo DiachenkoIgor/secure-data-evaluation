@@ -132,5 +132,9 @@ public class SFEConstructor {
         Util.sendMessage(continueM, os);
     }
 
+    public void close(){
+        sender.close();
+    }
+
 }
 

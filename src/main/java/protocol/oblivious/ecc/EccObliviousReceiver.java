@@ -73,6 +73,9 @@ public class EccObliviousReceiver extends ECOperations implements ObliviousRecei
         }
 
     }
+    public void close(){
+        super.close();
+    }
     private void fillEccParameters(EccStageOneMessage stageOneMessage){
         this.N=stageOneMessage.getN();
         this.A=stageOneMessage.getA();

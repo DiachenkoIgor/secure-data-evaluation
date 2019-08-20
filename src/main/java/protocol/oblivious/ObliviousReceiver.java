@@ -5,4 +5,5 @@ import java.io.IOException;
 public interface ObliviousReceiver {
     byte[] receive() throws IOException;
     void setChoice(int choice);
+    void close();
 }

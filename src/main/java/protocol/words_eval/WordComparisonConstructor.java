@@ -50,6 +50,7 @@ public class WordComparisonConstructor {
         return true;
     }
     public void stop() throws IOException {
+        bcc.close();
         this.is.close();
         this.os.close();
     }

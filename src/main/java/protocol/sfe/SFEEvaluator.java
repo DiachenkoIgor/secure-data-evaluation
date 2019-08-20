@@ -124,5 +124,8 @@ public class SFEEvaluator {
         return result;
     }
 
+    public void close(){
+        receiver.close();
+    }
 
 }

@@ -50,4 +50,7 @@ public class ByteComparisonConstructor {
         Gate gate = constructGateForByteEvaluation(bits);
         return !this.sfeConstructor.calculate(gate);
     }
+    public void close(){
+        sfeConstructor.close();
+    }
 }

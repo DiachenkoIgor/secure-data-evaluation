@@ -74,4 +74,7 @@ public class EccObliviousSender extends ECOperations implements ObliviousSender 
             ex.printStackTrace();
         }
     }
+    public void close(){
+        super.close();
+    }
 }

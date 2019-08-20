@@ -22,4 +22,7 @@ public class ByteComparisonEvaluator {
         }
         return !this.evaluator.calculate(bits);
     }
+    public void close(){
+        evaluator.close();
+    }
 }

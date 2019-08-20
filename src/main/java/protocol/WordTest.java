@@ -22,7 +22,7 @@ public class WordTest {
 
                 try {
                     System.out.println(wcc.compareWord("tables"));
-
+                    wcc.stop();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -31,6 +31,7 @@ public class WordTest {
             Thread.sleep(100);
             WordComparisonEvaluator wce = new WordComparisonEvaluator(pis2, pos2, "C:\\Users\\igor\\Downloads\\en-pos-maxent.bin");
             wce.compareWord("tables");
+            wce.stop();
             Thread.sleep(200);
         }
     }
