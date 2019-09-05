@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by IgorPc on 7/8/2019.
@@ -32,7 +33,9 @@ public class Util {
         }
         return pos_value_bits;
     }
-    public static String receiveMessage(InputStream inputStream) throws IOException {
+
+    public static  String receiveMessage(InputStream inputStream) throws IOException {
+
         int q=0;
         int t;
         boolean stop=true;
@@ -49,11 +52,11 @@ public class Util {
             baos.write(t);
         }
         String result = new String(baos.toByteArray(), "UTF-8");
-        //System.out.println(result);
+        //System.out.println("Read - "+result);
         return result;
     }
     public static void sendMessage(String m, OutputStream os) throws IOException {
-       // System.out.println(m);
+  //     System.out.println("Write - "+m);
         os.write(m.getBytes("UTF-8"));
         os.flush();
     }

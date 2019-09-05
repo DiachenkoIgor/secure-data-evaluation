@@ -10,6 +10,7 @@ import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.ECGenParameterSpec;
+import java.util.Arrays;
 
 public class CryptoUtil {
     private static final int AES_KEY_SIZE = 128;
@@ -105,6 +106,72 @@ public class CryptoUtil {
         throw new RuntimeException("HMAC");
     }
 
+    public static byte[] randomBinaryVector(int length){
+        byte[] tmp=new byte[length];
+        int val=random.nextInt((int)(Math.pow(length,2)-1));
+        String binaryS = Integer.toBinaryString(val);
+        for(int i=binaryS.length()-1;i>=0;i--){
+            tmp[--length]=binaryS.charAt(i)=='0'?(byte)0:(byte)1;
+        }
+        return tmp;
+    }
+    public static byte[] cleanRes(byte[] b){
+        for(int i=0;i<b.length;i++){
+            if(b[i]!=0){
+                byte[] res=new byte[b.length-i];
+                System.arraycopy(b,i,res,0,res.length);
+                return res;
+            }
+        }
+        return b;
+    }
+    public static byte[] xor(byte[] b1, byte[] b2) {
+        byte[] a;
+        byte[] b;
+        byte[] res;
+        if(b1.length<b2.length){
+            b=b2;
+            a=new byte[b2.length];
+            System.arraycopy(b1,0,a,b2.length-b1.length,b1.length);
+        }else if(b1.length>b2.length){
+            if(b1.length%b2.length!=0){
+                b=b2;
+                a=new byte[b1.length+b1.length%b2.length];
+                System.arraycopy(b1,0,a,b1.length%b2.length,b1.length);
+                b=repeat(b,a.length/b.length);
+            }else {
+                a=b1;
+                b=b2;
+                b=repeat(b,a.length/b.length);
+            }
+        }else {
+            a=b1;
+            b=b2;
+        }
+        res=new byte[a.length];
+        for(int i=0;i<a.length;i++){
+            res[i]=(byte)(a[i]^b[i%b.length]);
+        }
+        return res;
+    }
+    public static byte[] repeat(byte[] arr, int newLength) {
+        byte[] dup = Arrays.copyOf(arr, newLength);
+        for (int last = arr.length; last != 0 && last < newLength; last <<= 1) {
+            System.arraycopy(dup, 0, dup, last, Math.min(last << 1, newLength) - last);
+        }
+        return dup;
+    }
+
+    public static byte[] Hash(byte[] data)  {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        md.update(data);
+        return md.digest(data);
+    }
 
     public static byte[] generateEncodedAESKey(){
         return kgen.generateKey().getEncoded();
