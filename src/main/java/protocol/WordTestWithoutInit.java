@@ -22,15 +22,16 @@ public class WordTestWithoutInit {
 
             new Thread(() -> {
                 try {
-                    System.out.println(wcc.compareWord("Honorificabilitudinitatibus"));
+                  //  System.out.println(wcc.compareWord("Honorificabilitudinitatib"));
+                    System.out.println(wcc.compareWord("Honorificabilitudinitatib"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
             }).start();
             Thread.sleep(100);
-           wce.compareWord("Honorificabilitudinitatibus");
-            Thread.sleep(200);
+           wce.compareWord("Honorificabilitudinitatib");
+            Thread.sleep(100);
         }
     }
 

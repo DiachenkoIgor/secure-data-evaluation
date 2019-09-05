@@ -1,19 +1,17 @@
 package protocol.sfe;
 
-import protocol.Util;
+import protocol.Util.CryptoUtil;
+import protocol.Util.Util;
 import protocol.domain.ContinueMessage;
 import protocol.domain.CryptoPairHolder;
 import protocol.domain.GarbledTableMessage;
 import protocol.domain.GateResult;
 import protocol.domain.exceptions.SFEIOException;
 import protocol.domain.exceptions.YaoAESCryptographyException;
-import protocol.oblivious.ObliviousReceiver;
-import protocol.oblivious.ecc.EccObliviousReceiver;
-import protocol.oblivious.rsa.RsaObliviousReceiver;
+import protocol.oblivious.fastGC.NPObliviousReceiver;
+import protocol.oblivious.iknp.ExtendedObliviousReceiver;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Arrays;
 
 /**
@@ -22,33 +20,46 @@ import java.util.Arrays;
 public class SFEEvaluator {
     private InputStream is;
     private OutputStream os;
-    private ObliviousReceiver receiver;
+    private NPObliviousReceiver NPObliviousReceiver;
+    private ExtendedObliviousReceiver eor;
 
     public SFEEvaluator(InputStream is, OutputStream os) {
-        this.is = is;
-        this.os = os;
-        this.receiver=new EccObliviousReceiver(is,os);
+            this.os = os;
+            this.is = is;
+
+
     }
-
-
-    public boolean calculate(byte[] compareValue)  {
+    public void prepareForExtendedTransfer(byte[] choice,int messageLength) throws IOException {
+        this.eor=new ExtendedObliviousReceiver(is,os,choice,messageLength);
+        this.eor.initialize();
+    }
+    public boolean calculate(byte[] compareValue,boolean useExtended)  {
         boolean b=false;
         try {
             int pos = 0;
             boolean flag = true;
             while (flag) {
 
-                GarbledTableMessage tableMessage = Util.objectMapper.readValue(Util.receiveMessage(is), GarbledTableMessage.class);
+                GarbledTableMessage tableMessage = Util.objectMapper.readValue(Util.receiveMessage(is),GarbledTableMessage.class);
                 CryptoPairHolder[] cryptoPairHolders = tableMessage.getCryptoPairHolders();
                 createHalfEncryptTable(tableMessage.getLabel(), cryptoPairHolders);
 
-                this.receiver.setChoice(compareValue[pos++]);
-                byte[] bKey = this.receiver.receive();
+                byte[] bKey=null;
+                if(this.NPObliviousReceiver ==null && !useExtended){
+                    this.NPObliviousReceiver =new NPObliviousReceiver(is,os);
+                }
+                if(useExtended) {
+                    bKey=this.eor.receive();
+                }else {
+                    bKey = this.NPObliviousReceiver.receive(compareValue[pos++]);
+                }
                 byte[] result = createResultFromHalfEncrypted(cryptoPairHolders, bKey);
 
-                Util.sendMessage(Util.objectMapper.writeValueAsString(new GateResult(result, compareValue.length == pos)), os);
+                Util.sendMessage(
+                        Util.objectMapper.writeValueAsString(new GateResult(result, compareValue.length == pos)),
+                        os);
 
-                ContinueMessage continueMessage = Util.objectMapper.readValue(Util.receiveMessage(is), ContinueMessage.class);
+                ContinueMessage continueMessage = Util.objectMapper.readValue(Util.receiveMessage(is),ContinueMessage.class);
                 if(continueMessage.isContinued()){
                     flag=true;
                 }else {
@@ -74,6 +85,8 @@ public class SFEEvaluator {
         }catch (IOException ex){
             ex.printStackTrace();
             throw new SFEIOException("Something went wrong for SFEEvaluator!!");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return b;
     }
@@ -84,7 +97,7 @@ public class SFEEvaluator {
         for (int i = 0; i < cryptoPairHolders.length; i++) {
             try {
                 byte[] half_encrypted = CryptoUtil.AESdecrypt(cryptoPairHolders[i].getCipher(), aKey);
-                byte[] compare_hash = CryptoUtil.generateHash(half_encrypted, aKey);
+                byte[] compare_hash = CryptoUtil.generateHMAC(half_encrypted, aKey);
                 if(!Arrays.equals(compare_hash,cryptoPairHolders[i].getHashA())){
                     cryptoPairHolders[i]=null;
                     continue;
@@ -109,7 +122,7 @@ public class SFEEvaluator {
             try {
                 byte[] plain = CryptoUtil.AESdecrypt(pairs[i].getCipher(), bKey);
 
-                byte[] compare_hash = CryptoUtil.generateHash(plain, bKey);
+                byte[] compare_hash = CryptoUtil.generateHMAC(plain, bKey);
                 if(!Arrays.equals(compare_hash,pairs[i].getHashB())) continue;
                 result = CryptoUtil.AESdecrypt(pairs[i].getCipher(), bKey);
                 break;
@@ -123,9 +136,4 @@ public class SFEEvaluator {
         }
         return result;
     }
-
-    public void close(){
-        receiver.close();
-    }
-
 }

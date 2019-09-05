@@ -1,9 +1,11 @@
 package protocol.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by IgorPc on 7/9/2019.
  */
-public class GateResult {
+public class GateResult implements Serializable {
     private byte[] value;
     private boolean finish;
 

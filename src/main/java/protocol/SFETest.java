@@ -1,5 +1,6 @@
 package protocol;
 
+import protocol.Util.CryptoUtil;
 import protocol.sfe.*;
 
 import javax.crypto.*;
@@ -59,13 +60,13 @@ public class SFETest {
     new Thread(()->{
         SFEConstructor sfeConstructor = new SFEConstructor( pis1,pos1);
         long t=System.currentTimeMillis();
-            System.out.println(sfeConstructor.calculate(g1));
+            System.out.println(sfeConstructor.calculate(g1,false,CryptoUtil.AES_KEY_SIZE));
         System.out.println(System.currentTimeMillis()-t);
 
     }).start();
         Thread.sleep(100);
         SFEEvaluator sfeEvaluator=new SFEEvaluator(pis2,pos2);
-        sfeEvaluator.calculate(new byte[]{0,0,1});
+        sfeEvaluator.calculate(new byte[]{0,1,1},false);
 
     }
 }

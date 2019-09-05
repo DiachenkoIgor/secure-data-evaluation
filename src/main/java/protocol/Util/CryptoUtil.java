@@ -1,4 +1,4 @@
-package protocol.sfe;
+package protocol.Util;
 
 import protocol.domain.exceptions.YaoAESCryptographyException;
 
@@ -13,7 +13,7 @@ import java.security.spec.ECGenParameterSpec;
 import java.util.Arrays;
 
 public class CryptoUtil {
-    private static final int AES_KEY_SIZE = 128;
+    public static final int AES_KEY_SIZE = 128;
 
 
 
@@ -91,7 +91,7 @@ public class CryptoUtil {
         return new ECKey[]{(ECKey) keyPair.getPublic(),(ECKey)keyPair.getPrivate()};
        }
 
-    public static byte[] generateHash(byte[] data,byte[] key){
+    public static byte[] generateHMAC(byte[] data, byte[] key){
         try {
             Mac mac=Mac.getInstance("HmacSHA256");
             SecretKeySpec secretKeySpec=new SecretKeySpec(key,"RawBytes");
@@ -115,64 +115,17 @@ public class CryptoUtil {
         }
         return tmp;
     }
-    public static byte[] cleanRes(byte[] b){
-        for(int i=0;i<b.length;i++){
-            if(b[i]!=0){
-                byte[] res=new byte[b.length-i];
-                System.arraycopy(b,i,res,0,res.length);
-                return res;
-            }
-        }
-        return b;
-    }
+
     public static byte[] xor(byte[] b1, byte[] b2) {
-        byte[] a;
-        byte[] b;
-        byte[] res;
-        if(b1.length<b2.length){
-            b=b2;
-            a=new byte[b2.length];
-            System.arraycopy(b1,0,a,b2.length-b1.length,b1.length);
-        }else if(b1.length>b2.length){
-            if(b1.length%b2.length!=0){
-                b=b2;
-                a=new byte[b1.length+b1.length%b2.length];
-                System.arraycopy(b1,0,a,b1.length%b2.length,b1.length);
-                b=repeat(b,a.length/b.length);
-            }else {
-                a=b1;
-                b=b2;
-                b=repeat(b,a.length/b.length);
-            }
-        }else {
-            a=b1;
-            b=b2;
+        if(b1.length!=b2.length){
+            throw new IllegalArgumentException("Byte arrays with different size!");
         }
-        res=new byte[a.length];
-        for(int i=0;i<a.length;i++){
-            res[i]=(byte)(a[i]^b[i%b.length]);
+        byte[] res=new byte[b1.length];
+        for(int i=0;i<b1.length;i++){
+            res[i]=(byte)(b1[i]^b2[i]);
         }
         return res;
     }
-    public static byte[] repeat(byte[] arr, int newLength) {
-        byte[] dup = Arrays.copyOf(arr, newLength);
-        for (int last = arr.length; last != 0 && last < newLength; last <<= 1) {
-            System.arraycopy(dup, 0, dup, last, Math.min(last << 1, newLength) - last);
-        }
-        return dup;
-    }
-
-    public static byte[] Hash(byte[] data)  {
-        MessageDigest md = null;
-        try {
-            md = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        md.update(data);
-        return md.digest(data);
-    }
-
     public static byte[] generateEncodedAESKey(){
         return kgen.generateKey().getEncoded();
     }

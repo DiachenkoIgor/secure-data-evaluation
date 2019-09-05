@@ -1,6 +1,8 @@
 package protocol.domain;
 
-public class CryptoPairHolder {
+import java.io.Serializable;
+
+public class CryptoPairHolder implements Serializable {
     private byte[] cipher;
     private byte[] hashA;
     private byte[] hashB;

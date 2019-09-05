@@ -1,42 +1,41 @@
 
 package protocol.sfe;
 
-import protocol.Util;
+import protocol.Util.Util;
 import protocol.domain.ContinueMessage;
 import protocol.domain.CryptoPairHolder;
 import protocol.domain.GarbledTableMessage;
 import protocol.domain.GateResult;
 import protocol.domain.exceptions.SFEIOException;
-import protocol.oblivious.ObliviousSender;
-import protocol.oblivious.ecc.EccObliviousSender;
-import protocol.oblivious.rsa.RsaObliviousSender;
+import protocol.oblivious.fastGC.NPObliviousSender;
+import protocol.oblivious.iknp.ExtendedObliviousSender;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Arrays;
 
 
-/**
- * Created by IgorPc on 7/9/2019.
- */
 public class SFEConstructor {
     private InputStream is;
     private OutputStream os;
-    private ObliviousSender sender;
+    private NPObliviousSender sender;
+    private ExtendedObliviousSender eos;
 
-    public SFEConstructor( InputStream is, OutputStream os) {
-        this.is = is;
-        this.os = os;
-        this.sender=new EccObliviousSender(is,os);
+    public SFEConstructor(InputStream is, OutputStream os) {
+
+            this.os = os;
+            this.is = is;
     }
 
-    public boolean calculate(Gate start) {
+    public void prepareForExtendedTransfer(int quantityOfPairs,int length) throws IOException {
+        this.eos=new ExtendedObliviousSender(is,os,quantityOfPairs,length);
+        this.eos.connect();
+    }
+    public boolean calculate(Gate start,boolean useExtended, int messageBitLength) {
         try {
             boolean f = true;
             Gate g = start;
             while (f) {
-                boolean isFinished = calculateLogic(g);
+                boolean isFinished = calculateLogic(g,useExtended,messageBitLength);
                 if (isFinished) {
                     if (checkForNextNotCalculatedGates(g)) {
                         sendContinueMessage(false,(byte)-1);
@@ -51,6 +50,14 @@ public class SFEConstructor {
                     }
                 }
                 if (!checkForNextNotCalculatedGates(g)) {
+                    if(useExtended){
+                        Gate last = g;
+                        while (last.getNext() != null) {
+                            last = last.getNext();
+                        }
+                        sendContinueMessage(false,last.getOutputValue());
+                        return last.getOutputValue() == 1;
+                    }
                     sendContinueMessage(false,(byte)-1);
                     throw new RuntimeException("Size of compare bits is different");
                 } else {
@@ -71,7 +78,7 @@ public class SFEConstructor {
         throw new SFEIOException("Something went wrong for SFEConstructor Protocol!!");
     }
 
-    private boolean calculateLogic(Gate gate) throws IOException {
+    private boolean calculateLogic(Gate gate, boolean useExtended, int messageBitLength) throws IOException {
         if(gate.isCalculated()) {
             gate.calculate();
             return false;
@@ -84,13 +91,21 @@ public class SFEConstructor {
         Util.shuffleArray(encodedTable);
 
         GarbledTableMessage tableMessage = createGarbledTableMessage(encodedTable,gate);
-        String asString = Util.objectMapper.writeValueAsString(tableMessage);
-        Util.sendMessage(asString,os);
+        Util.sendMessage(Util.objectMapper.writeValueAsString(tableMessage),os);
 
         byte[][] otValues = prepareValueForOT(gate);
-        sender.init(otValues[0],otValues[1]);
-        sender.send();
-
+        if(this.sender==null && !useExtended){
+            try {
+                this.sender=new NPObliviousSender(messageBitLength,is,os);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if(useExtended){
+            this.eos.send(otValues[0],otValues[1]);
+        }else {
+            this.sender.send(otValues[0], otValues[1]);
+        }
 
         GateResult gateResult = Util.objectMapper.readValue(Util.receiveMessage(is), GateResult.class);
 
@@ -100,8 +115,10 @@ public class SFEConstructor {
 
     private  byte defineResult(Gate gate,byte[] label){
         if(Arrays.equals(label,gate.getLabels()[4])){
+
             return 0;
         }else {
+
             return 1;
         }
     }
@@ -128,12 +145,10 @@ public class SFEConstructor {
         return false;
     }
     private void sendContinueMessage(boolean val,byte res) throws IOException{
-        String continueM = Util.objectMapper.writeValueAsString(new ContinueMessage(val,res));
-        Util.sendMessage(continueM, os);
-    }
-
-    public void close(){
-        sender.close();
+        Util.sendMessage(
+                Util.objectMapper.writeValueAsString(new ContinueMessage(val,res)),
+                os
+        );
     }
 
 }

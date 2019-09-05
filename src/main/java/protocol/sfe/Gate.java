@@ -1,6 +1,8 @@
 package protocol.sfe;
 
 
+import protocol.Util.CryptoUtil;
+
 public abstract class Gate {
    private byte[][] table;
    private byte[][] encodeResult;
@@ -78,12 +80,12 @@ public abstract class Gate {
         }
         for(int i=0;i<encodeResult.length;i++){
             byte[] key=table[i][1]==0 ? labels[2]:labels[3];
-            this.result_macB[i]=CryptoUtil.generateHash(encodeResult[i],key);
+            this.result_macB[i]=CryptoUtil.generateHMAC(encodeResult[i],key);
             encodeResult[i]=CryptoUtil.AESencrypt(encodeResult[i],key);
         }
         for(int i=0;i<encodeResult.length;i++){
             byte[] key=table[i][0]==0 ? labels[0]:labels[1];
-            this.result_macA[i]=CryptoUtil.generateHash(encodeResult[i],key);
+            this.result_macA[i]=CryptoUtil.generateHMAC(encodeResult[i],key);
             encodeResult[i]=CryptoUtil.AESencrypt(encodeResult[i],key);
         }
     }

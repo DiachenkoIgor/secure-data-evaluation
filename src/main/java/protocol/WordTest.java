@@ -28,7 +28,6 @@ public class WordTest {
                 }
 
             }).start();
-            Thread.sleep(100);
             WordComparisonEvaluator wce = new WordComparisonEvaluator(pis2, pos2, "C:\\Users\\igor\\Downloads\\en-pos-maxent.bin");
             wce.compareWord("tables");
             wce.stop();

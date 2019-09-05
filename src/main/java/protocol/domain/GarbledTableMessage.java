@@ -1,9 +1,11 @@
 package protocol.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by IgorPc on 7/9/2019.
  */
-public class GarbledTableMessage {
+public class GarbledTableMessage implements Serializable {
     private CryptoPairHolder[] cryptoPairHolders;
     private byte[] label;
 

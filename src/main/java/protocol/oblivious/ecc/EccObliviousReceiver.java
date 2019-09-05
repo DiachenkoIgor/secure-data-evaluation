@@ -1,8 +1,8 @@
 package protocol.oblivious.ecc;
 
-import protocol.Util;
+import protocol.Util.Util;
 import protocol.oblivious.ObliviousReceiver;
-import protocol.sfe.CryptoUtil;
+import protocol.Util.CryptoUtil;
 
 import java.io.IOException;
 import java.io.InputStream;

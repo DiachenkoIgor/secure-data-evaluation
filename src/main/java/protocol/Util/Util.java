@@ -1,4 +1,4 @@
-package protocol;
+package protocol.Util;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,9 +14,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-/**
- * Created by IgorPc on 7/8/2019.
- */
+
 public class Util {
 
     public static final ObjectMapper objectMapper=new ObjectMapper();

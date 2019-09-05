@@ -1,15 +1,11 @@
 package protocol.oblivious.ecc;
 
-import protocol.Util;
+import protocol.Util.Util;
 import protocol.oblivious.ObliviousSender;
-import protocol.oblivious.rsa.MiddleMessage;
-import protocol.sfe.CryptoUtil;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.security.interfaces.ECKey;
-import java.security.interfaces.RSAKey;
 import java.security.spec.ECPoint;
 
 public class EccObliviousSender extends ECOperations implements ObliviousSender {

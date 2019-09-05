@@ -1,10 +1,12 @@
 package protocol.words_eval;
 
+import protocol.Util.CryptoUtil;
 import protocol.sfe.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class ByteComparisonConstructor {
     private InputStream is;
@@ -43,14 +45,15 @@ public class ByteComparisonConstructor {
         return startXOR;
     }
 
-    public boolean compare(byte[] bits) {
-        if(bits.length!=8){
+    public void initExtendedOblivious(int quantity) throws IOException {
+        this.sfeConstructor.prepareForExtendedTransfer(quantity,CryptoUtil.AES_KEY_SIZE);
+    }
+    public boolean compare(byte[] bits,boolean useExtended) {
+        if(bits.length!=8 && !useExtended){
             throw new IllegalArgumentException("Bits size array is not 8");
         }
         Gate gate = constructGateForByteEvaluation(bits);
-        return !this.sfeConstructor.calculate(gate);
-    }
-    public void close(){
-        sfeConstructor.close();
+
+        return !this.sfeConstructor.calculate(gate,useExtended,CryptoUtil.AES_KEY_SIZE);
     }
 }

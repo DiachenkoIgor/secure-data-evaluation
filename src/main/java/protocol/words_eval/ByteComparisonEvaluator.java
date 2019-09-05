@@ -1,7 +1,9 @@
 package protocol.words_eval;
 
+import protocol.Util.CryptoUtil;
 import protocol.sfe.SFEEvaluator;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -16,13 +18,14 @@ public class ByteComparisonEvaluator {
         this.evaluator =new SFEEvaluator(is,os);
     }
 
-    public boolean compare(byte[] bits) {
-        if(bits.length!=8){
+    public void prepareForExtendedOT(byte[] choice) throws IOException {
+        this.evaluator.prepareForExtendedTransfer(choice,CryptoUtil.AES_KEY_SIZE);
+    }
+
+    public boolean compare(byte[] bits,boolean useExtended) {
+        if(bits.length!=8 && !useExtended){
             throw new IllegalArgumentException("Bits size array is not 8");
         }
-        return !this.evaluator.calculate(bits);
-    }
-    public void close(){
-        evaluator.close();
+        return !this.evaluator.calculate(bits,useExtended);
     }
 }

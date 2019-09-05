@@ -1,7 +1,6 @@
 package protocol.oblivious.rsa;
 
-import protocol.Util;
-import protocol.oblivious.ObliviousReceiver;
+import protocol.Util.Util;
 
 import java.io.IOException;
 import java.io.InputStream;

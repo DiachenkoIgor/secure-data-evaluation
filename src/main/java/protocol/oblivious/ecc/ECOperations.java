@@ -1,9 +1,8 @@
 package protocol.oblivious.ecc;
 
-import protocol.WordTestWithoutInit;
 import protocol.math.GMP;
 import protocol.oblivious.CipollasAlgorithm;
-import protocol.sfe.CryptoUtil;
+import protocol.Util.CryptoUtil;
 import sun.security.ec.ECPrivateKeyImpl;
 import sun.security.ec.ECPublicKeyImpl;
 

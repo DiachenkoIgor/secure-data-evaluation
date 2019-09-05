@@ -1,9 +1,11 @@
 package protocol.domain;
 
+import java.io.Serializable;
+
 /**
  * Created by IgorPc on 7/9/2019.
  */
-public class ContinueMessage {
+public class ContinueMessage implements Serializable {
     private boolean continued;
     private byte code;
 

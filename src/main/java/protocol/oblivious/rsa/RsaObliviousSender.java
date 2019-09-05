@@ -1,8 +1,7 @@
 package protocol.oblivious.rsa;
 
-import protocol.oblivious.ObliviousSender;
-import protocol.sfe.CryptoUtil;
-import protocol.Util;
+import protocol.Util.CryptoUtil;
+import protocol.Util.Util;
 
 import java.io.*;
 import java.math.BigInteger;
