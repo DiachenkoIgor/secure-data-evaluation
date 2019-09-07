@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class ExtendedObliviousReceiver {
     private InputStream is;
@@ -34,6 +35,15 @@ public class ExtendedObliviousReceiver {
         NPObliviousSender sender=new NPObliviousSender(m,is,os);
         for(int i=0;i<k;i++){
             byte[] column = getColumn(i);
+            /*System.out.println(
+                    "Send - "+Arrays.toString(column));
+            System.out.println("Send - "+
+                    Arrays.toString(CryptoUtil.xor(r,column)));*/
+         /*   try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }*/
             sender.send(ExtendedOTUtil.convertForOT(column,m),
                     ExtendedOTUtil.convertForOT(CryptoUtil.xor(r,column),m));
         }
@@ -42,18 +52,18 @@ public class ExtendedObliviousReceiver {
     public byte[] receive() throws IOException {
         TransferMessage transfer = Util.objectMapper.readValue(Util.receiveMessage(is), TransferMessage.class);
         byte[] bytes=null;
-        if(r[counter]==0){
+        BigInteger pos=BigInteger.valueOf(counter);
+       if(r[counter]==0){
            BigInteger t = new BigInteger(
                    ExtendedOTUtil.convertForOT(this.T[counter++],k));
-            bytes=Cipher.decrypt(
+         bytes=Cipher.decrypt(pos,
                    t,transfer.getY0(),this.messageLength).toByteArray();
         }else {
             BigInteger t = new BigInteger(
                     ExtendedOTUtil.convertForOT(this.T[counter++],k));
-          bytes=Cipher.decrypt(
+         bytes=Cipher.decrypt(pos,
                    t,transfer.getY1(),this.messageLength).toByteArray();
         }
-
         byte[] tmp=new byte[bytes.length-1];
         System.arraycopy(bytes,1,tmp,0,tmp.length);
         bytes=tmp;

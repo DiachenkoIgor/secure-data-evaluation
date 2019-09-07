@@ -4,13 +4,14 @@ import protocol.domain.exceptions.YaoAESCryptographyException;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.ECGenParameterSpec;
-import java.util.Arrays;
+
 
 public class CryptoUtil {
     public static final int AES_KEY_SIZE = 128;
@@ -108,11 +109,13 @@ public class CryptoUtil {
 
     public static byte[] randomBinaryVector(int length){
         byte[] tmp=new byte[length];
-        int val=random.nextInt((int)(Math.pow(length,2)-1));
-        String binaryS = Integer.toBinaryString(val);
-        for(int i=binaryS.length()-1;i>=0;i--){
-            tmp[--length]=binaryS.charAt(i)=='0'?(byte)0:(byte)1;
+        BigInteger val = new BigInteger(length, random);
+        val=protocol.oblivious.fastGC.Cipher.getPaddingOfLength(val,length);
+        length--;
+        for(int i=0;i<tmp.length;i++){
+            tmp[i]=val.testBit(length--) ? (byte) 1: (byte) 0;
         }
+
         return tmp;
     }
 

@@ -4,21 +4,20 @@ import opennlp.tools.postag.POSModel;
 import opennlp.tools.postag.POSTaggerME;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 public class POSTool {
     private POSModel model;
     private POSTaggerME tagger;
-    private String pathToTrainData;
 
-    public POSTool(String pathToTrainData) {
-        this.pathToTrainData = pathToTrainData;
+    public POSTool(InputStream from) {
 
         try {
-            InputStream modelStream = new FileInputStream(pathToTrainData);
-            model = new POSModel(modelStream);
+            model = new POSModel(from);
             tagger = new POSTaggerME(model);
         } catch (IOException e) {
             System.out.println(e.getMessage());

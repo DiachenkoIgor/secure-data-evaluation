@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class ExtendedObliviousSender {
     private InputStream is;
@@ -38,7 +39,7 @@ public class ExtendedObliviousSender {
         NPObliviousReceiver NPObliviousReceiver =new NPObliviousReceiver(is,os);
         for(int i=0;i<k;i++){
             byte[] receive = NPObliviousReceiver.receive(s[i]);
-           setColumn(
+            setColumn(
                    ExtendedOTUtil.convertFromOT(receive,m),
                    i);
         }
@@ -55,14 +56,15 @@ public class ExtendedObliviousSender {
                 ExtendedOTUtil.prepareByteArray(x1));
         BigInteger msg2=new BigInteger(ExtendedOTUtil.prepareByteArray(x2));
 
-       BigInteger y0Q = new BigInteger(
+        BigInteger y0Q = new BigInteger(
                ExtendedOTUtil.convertForOT(this.Q[counter],k));
         BigInteger y1Q = new BigInteger(
                 ExtendedOTUtil.convertForOT(CryptoUtil.xor(Q[counter],s),k));
-        BigInteger y0=Cipher.encrypt(y0Q,msg1,l);
-        BigInteger y1=Cipher.encrypt(y1Q,msg2,l);
+        BigInteger pos=BigInteger.valueOf(counter);
+        BigInteger y0=Cipher.encrypt(pos,y0Q,msg1,l);
+        BigInteger y1=Cipher.encrypt(pos,y1Q,msg2,l);
 
-       TransferMessage transferMessage=new TransferMessage(y0,y1);
+        TransferMessage transferMessage=new TransferMessage(y0,y1);
         String transferString = Util.objectMapper.writeValueAsString(transferMessage);
         Util.sendMessage(transferString,os);
         counter++;

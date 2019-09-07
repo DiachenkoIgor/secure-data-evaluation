@@ -19,7 +19,7 @@ public class WordComparisonConstructor {
     public WordComparisonConstructor(InputStream is, OutputStream os, String pathToTrainData) {
         this.is = is;
         this.os = os;
-        this.posTool=new POSTool(pathToTrainData);
+        this.posTool=new POSTool(Util.getResourceAsStream(pathToTrainData));
         this.stemTool=new StemTool();
         this.bcc=new ByteComparisonConstructor(is,os);
     }

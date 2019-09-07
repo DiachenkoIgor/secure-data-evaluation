@@ -51,7 +51,7 @@ public class NPObliviousReceiver  {
 
     }
 
-    public void step1() throws IOException {
+    private void step1() throws IOException {
         BigInteger k = (new BigInteger(q.bitLength(), rnd)).mod(q);
         BigInteger gk=g.modPow(k,p);
         BigInteger c_over_gk = C.multiply(gk.modInverse(p)).mod(p);

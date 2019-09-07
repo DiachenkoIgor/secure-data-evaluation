@@ -23,6 +23,10 @@ public class Util {
         objectMapper.configure(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT, false);
     }
 
+    public static InputStream getResourceAsStream(String path){
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        return classloader.getResourceAsStream(path);
+    }
     public static byte[] byteToBitArray(byte value){
         String binaryString = Integer.toBinaryString(value);
         byte[] pos_value_bits=new byte[8];
