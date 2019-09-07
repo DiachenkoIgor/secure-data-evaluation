@@ -10,7 +10,8 @@ public final class GMP extends Number implements Comparable<GMP>
 
     static
     {
-        System.load("C:\\cygwin64\\home\\igor\\jni\\libnativegmp.dll");
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        System.load(classloader.getResource("gnu/libnativegmp.dll").getFile());
         natInitializeLibrary();
     }
 
